@@ -1,0 +1,25 @@
+POST /youtubei/v1/browse?prettyPrint=false HTTP/3
+Host: music.youtube.com
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:145.0) Gecko/20100101 Firefox/145.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br, zstd
+Content-Type: application/json
+Content-Length: 3392
+Referer: https://music.youtube.com/search?q=sabki+kahani+antariksh
+X-Goog-Visitor-Id: Cgs3Y1ZUdUFvSnc3WSi6xILJBjIKCgJJThIEGgAgFA%3D%3D
+X-Youtube-Bootstrap-Logged-In: true
+X-Youtube-Client-Name: 67
+X-Youtube-Client-Version: 1.20251117.03.00
+X-Goog-AuthUser: 0
+X-Origin: https://music.youtube.com
+Origin: https://music.youtube.com
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: same-origin
+Sec-Fetch-Site: same-origin
+Authorization: SAPISIDHASH 1763746497_07e85bdbef2a0dd780e5d6456ce604c472460d07_u SAPISID1PHASH 1763746497_07e85bdbef2a0dd780e5d6456ce604c472460d07_u SAPISID3PHASH 1763746497_07e85bdbef2a0dd780e5d6456ce604c472460d07_u
+Connection: keep-alive
+Alt-Used: music.youtube.com
+Cookie: YSC=jL8lLcsNaXU; VISITOR_INFO1_LIVE=7cVTuAoJw7Y; VISITOR_PRIVACY_METADATA=CgJJThIEGgAgFA%3D%3D; __Secure-ROLLOUT_TOKEN=CPDO2b6s9sGSTBDQl-OD4oORAxig37GE4oORAw%3D%3D; _gcl_au=1.1.1776041671.1763746046; __Secure-1PSIDTS=sidts-CjUBwQ9iIwDjYtD4hfZpIibnQMfLkVbBeWDQMf7GPHi4-yFrcyRWUsVPm9wXuUw4f_JjQNwikxAA; __Secure-3PSIDTS=sidts-CjUBwQ9iIwDjYtD4hfZpIibnQMfLkVbBeWDQMf7GPHi4-yFrcyRWUsVPm9wXuUw4f_JjQNwikxAA; HSID=AbyjpyufRhPQJMXMj; SSID=A0bGJTPdixjvYEuwL; APISID=wbDa40f9LceiIeoz/A8lADz8t_UVE1OZx8; SAPISID=nE2M2nQUgySQrIYb/A_QfO9zALHmhrejMo; __Secure-1PAPISID=nE2M2nQUgySQrIYb/A_QfO9zALHmhrejMo; __Secure-3PAPISID=nE2M2nQUgySQrIYb/A_QfO9zALHmhrejMo; SID=g.a0003wgP9iG2T-z3OoWwgnxgSfZxh1XvXr1DgQHCc3FnM2YDkRZ5AyUZbciYKinpOwgfEfzNNwACgYKAQoSARQSFQHGX2Mi9xwuZRmcJ-bZ24Ow4fbDxBoVAUF8yKrq4rXRiVWFWMwSJ4Ku_7Lm0076; __Secure-1PSID=g.a0003wgP9iG2T-z3OoWwgnxgSfZxh1XvXr1DgQHCc3FnM2YDkRZ5SL_WY_RB8WmyRhY7GrAnuQACgYKAfgSARQSFQHGX2MiyrPbx2nMdniW8ZbtmU1KuhoVAUF8yKo3XyrsWFA1Mp7YGYQaKtwm0076; __Secure-3PSID=g.a0003wgP9iG2T-z3OoWwgnxgSfZxh1XvXr1DgQHCc3FnM2YDkRZ5UmRAwnl6j8xB916aikfQvgACgYKAR0SARQSFQHGX2Mi2FFmmfO418fUXYJdkQRWbhoVAUF8yKpyww1Mci166O50JpKDEz3n0076; LOGIN_INFO=AFmmF2swRAIgbnX3RCBy0zCIRcqCL7K7sSTcXBufBqaT0bFlWIkg9jMCIHxpgyeppQwKRX1taQxHqbe6IgfWns-3ga3w0NQZWPIC:QUQ3MjNmenZOeFhtRlItTHllMFE2UHBPNWxNX3RYZjFTek9xVlhrS3RnOVozVlhmcU02VG9CcmNlYXNZbkNnV0tzX3RXYkNkelNpWDBjU0tHZHJWY2Zvd1dRSmt3ekhWNE5HTUM3NERoMWE3NEtHcmFYb3E4Y1NQMGFDNnBMMXB6cmhMaGNFUi1iUFBCYWRITkE5aHF2WW9GSkVXMnhiRzBR; SIDCC=AKEyXzXb7-WSDVxRDoYbFOHgjjmgy3Zo9KP3LNzpryoUQimEvpdG7AST7vfsE1AB1q58J2lMiw; __Secure-1PSIDCC=AKEyXzWm7UsQj8YPY13UsMqMgYYnliDPTB0KcR-jX8jNFuxk8gX6Wx7OIOUCbMvA3xq9PdQxnw; __Secure-3PSIDCC=AKEyXzW5-o5orm2kbsalISBfF6m6DuBpQ0wl7ZtRI3Z6oBs8ZgG25W_oekyrvAMnLj0dCex2Lg; PREF=repeat=NONE
+Priority: u=0
+TE: trailers
