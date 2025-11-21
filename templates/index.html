@@ -1,8 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}Welcome - Music Sync{% endblock %}
+{% block title %}Music Sync - Free Spotify to YouTube Music Playlist Converter & Sync Tool{% endblock %}
 
 {% block content %}
+<!-- JSON-LD Structured Data for Google -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Music Sync",
+  "description": "Free online tool to sync and transfer playlists between Spotify and YouTube Music. Bidirectional playlist converter with real-time progress tracking.",
+  "url": "https://mymusicsync.duckdns.org",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "Spotify to YouTube Music playlist transfer",
+    "YouTube Music to Spotify playlist transfer",
+    "Real-time sync progress tracking",
+    "Multi-user support",
+    "Secure OAuth authentication",
+    "Bidirectional playlist synchronization"
+  ]
+}
+</script>
+
 <div class="row justify-content-center mt-5">
     <div class="col-md-10">
         <div class="card">

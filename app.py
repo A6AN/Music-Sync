@@ -183,6 +183,19 @@ def internal_error(e):
     return render_template('500.html'), 500
 
 
+# SEO routes
+@app.route('/sitemap.xml')
+def sitemap():
+    """Serve sitemap for search engines"""
+    return render_template('sitemap.xml'), 200, {'Content-Type': 'application/xml'}
+
+
+@app.route('/robots.txt')
+def robots():
+    """Serve robots.txt for search engines"""
+    return render_template('robots.txt'), 200, {'Content-Type': 'text/plain'}
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

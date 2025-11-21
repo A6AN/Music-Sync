@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /register
+Allow: /login
+Disallow: /dashboard
+Disallow: /spotify/
+Disallow: /ytmusic/
+Disallow: /sync/
+Disallow: /logout
+
+Sitemap: https://mymusicsync.duckdns.org/sitemap.xml
