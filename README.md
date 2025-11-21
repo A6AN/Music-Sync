@@ -1,56 +1,211 @@
-### Overview
+# 🔥 Music Sync - Universal Music Platform Synchronizer
 
-This is a set of scripts for copying "liked" songs and playlists from Spotify to YTMusic. It provides a GUI (implemented by Yoween, formerly called spotify_to_ytmusic_gui).
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
+![Flask](https://img.shields.io/badge/flask-3.0.0-green.svg)
 
----
+A beautiful, production-ready web application for seamlessly syncing playlists between music streaming platforms. Currently supports **Spotify ↔ YouTube Music** with a roadmap for Apple Music, Amazon Music, and Tidal.
 
-### Preparation/Pre-Conditions
+**Live Demo:** [https://mymusicsync.duckdns.org](https://mymusicsync.duckdns.org)
 
-1. **Install Python and Git** (you may already have them installed).
-2. **Uninstall the pip package from the original repository** (if you previously installed `linsomniac/spotify_to_ytmusic`):
+## ✨ Features
 
-   On Windows:
+- 🎵 **Bidirectional Sync**: Transfer playlists from Spotify → YouTube Music or YouTube Music → Spotify
+- 👥 **Multi-User Support**: Secure authentication system with encrypted credentials
+- 📊 **Real-Time Progress**: Live sync progress with Server-Sent Events (SSE)
+- 📝 **Sync History**: Track all your playlist transfers with timestamps
+- 🎨 **Premium UI**: Beautiful "On Fire" color palette with smooth animations
+- 🔐 **Secure OAuth**: Industry-standard OAuth 2.0 for Spotify authentication
+- 🐳 **Docker Ready**: One-command deployment with Docker Compose
+- 🔒 **HTTPS/SSL**: Production-ready with Let's Encrypt certificates
+- 💾 **Backup System**: Automated database backups
 
-   ```bash
-   python -m pip uninstall spotify2ytmusic
-   ```
+## 🚀 Quick Start
 
-   On Linux or Mac:
+### Prerequisites
 
-   ```bash
-   python3 -m pip uninstall spotify2ytmusic
-   ```
+- Python 3.9 or higher
+- Spotify Developer Account
+- YouTube Music account (with uploaded music library)
 
----
+### Local Development
 
-### Setup Instructions
-
-#### 1. Clone, Create a Virtual Environment, and Install Required Packages
-
-Start by creating and activating a Python virtual environment to isolate dependencies.
-
+1. **Clone the repository**
 ```bash
-git clone https://github.com/linsomniac/spotify_to_ytmusic.git
+git clone https://github.com/yourusername/spotify_to_ytmusic.git
 cd spotify_to_ytmusic
 ```
 
-On Windows:
-
+2. **Install dependencies**
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install ytmusicapi tk
+pip install -r requirements-web.txt
 ```
 
-On Linux or Mac:
+3. **Configure environment**
+```bash
+cp .env.example .env
+nano .env
+```
+
+Add your credentials:
+```env
+SECRET_KEY=your_secret_key_here
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+```
+
+4. **Run the application**
+```bash
+python3 app.py
+```
+
+Visit `http://localhost:5000` in your browser!
+
+## 🐳 Docker Deployment
+
+### Quick Deploy (HTTP)
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install ytmusicapi tk
+docker-compose up -d
 ```
+
+### Production Deploy (HTTPS with SSL)
+
+1. **Set up your domain** (using Duck DNS or your own domain)
+```bash
+# Update your domain's A record to point to your server IP
+```
+
+2. **Run the SSL setup script**
+```bash
+chmod +x setup-ssl.sh
+./setup-ssl.sh
+```
+
+3. **Update environment variables**
+```bash
+nano .env
+# Add your Spotify credentials
+```
+
+4. **Deploy**
+```bash
+docker-compose up -d --build
+```
+
+Your app will be live at `https://yourdomain.com`!
+
+## 📋 Detailed Setup Guides
+
+### Spotify API Setup
+
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create a new app
+3. Note your `Client ID` and `Client Secret`
+4. Add redirect URI: `https://yourdomain.com/spotify/callback`
+5. Add these to your `.env` file
+
+### YouTube Music Setup
+
+1. Install [ytmusicapi](https://github.com/sigma67/ytmusicapi) locally:
+```bash
+pip install ytmusicapi
+ytmusicapi oauth
+```
+
+2. This creates `oauth.json` with your YouTube Music credentials
+3. In the web app, go to Settings → YouTube Music → Upload Headers
+4. Upload your `oauth.json` file
+
+## 🛠️ Tech Stack
+
+- **Backend**: Flask 3.0.0, SQLAlchemy, Flask-Login
+- **Frontend**: Bootstrap 5, Vanilla JavaScript
+- **APIs**: Spotify Web API, YouTube Music API (ytmusicapi)
+- **Database**: SQLite (easily swappable to PostgreSQL)
+- **Deployment**: Docker, Docker Compose, Nginx, Let's Encrypt
+- **Security**: Bcrypt password hashing, OAuth 2.0, HTTPS/TLS 1.3
+
+## 📸 Screenshots
+
+> Coming soon! Feel free to contribute screenshots in the Issues or Pull Requests.
+
+## 🗺️ Roadmap
+
+### Current Platforms
+- ✅ Spotify
+- ✅ YouTube Music
+
+### Planned Integrations
+- 🎵 **Apple Music** - Waiting for better API access
+- 🎶 **Amazon Music** - Awaiting API improvements
+- 🌊 **Tidal** - Coming to India soon!
+- 🎧 **Deezer** - Under consideration
+- ☁️ **SoundCloud** - Under consideration
+
+### Feature Roadmap
+- [ ] Playlist scheduling (auto-sync daily/weekly)
+- [ ] Liked songs sync
+- [ ] Album sync
+- [ ] Smart playlist matching (fuzzy matching for missing songs)
+- [ ] Sync statistics and analytics
+- [ ] Mobile app (React Native)
+- [ ] Browser extension
+- [ ] CLI tool improvements
+
+## 🤝 Contributing
+
+Contributions are **highly encouraged**! Whether you want to:
+- Add support for new music platforms
+- Improve the UI/UX
+- Fix bugs or improve performance
+- Add new features
+- Improve documentation
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### How to Contribute
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [ytmusicapi](https://github.com/sigma67/ytmusicapi) by sigma67 - Excellent YouTube Music API wrapper
+- [Spotify Web API](https://developer.spotify.com/documentation/web-api/) - Comprehensive music platform API
+- [Flask](https://flask.palletsprojects.com/) - Lightweight and powerful web framework
+
+## 🐛 Known Issues
+
+- YouTube Music search may not find exact matches for some songs (API limitation)
+- Spotify rate limiting may slow down large playlist syncs (>1000 songs)
+- Some regional restrictions may apply based on music availability
+
+## 💬 Support
+
+- 📧 **Email**: Open an issue on GitHub
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/spotify_to_ytmusic/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/yourusername/spotify_to_ytmusic/discussions)
+
+## ⭐ Star History
+
+If you find this project useful, please consider giving it a star! It helps others discover the project.
 
 ---
+
+## 📚 Legacy CLI Tool
+
+This repository also contains the original command-line tool for migrating playlists. See below for CLI instructions.
+
+<details>
+<summary><strong>Click to expand CLI documentation</strong></summary>
 
 #### 2. Generate YouTube Music Credentials
 

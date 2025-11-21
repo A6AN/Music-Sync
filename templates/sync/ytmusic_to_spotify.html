@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}YouTube Music to Spotify{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-youtube"></i> YouTube Music → <i class="bi bi-spotify"></i> Spotify
+                </h4>
+            </div>
+            <div class="card-body">
+                <div id="sync-setup">
+                    <p class="text-muted">Select a YouTube Music playlist to sync to Spotify</p>
+                    
+                    <div class="mb-3">
+                        <label for="playlistSelect" class="form-label">Select Playlist</label>
+                        <select class="form-select" id="playlistSelect" disabled>
+                            <option value="">Loading playlists...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="playlistName" class="form-label">Playlist Name (Optional)</label>
+                        <input type="text" class="form-control" id="playlistName" 
+                               placeholder="Leave blank to use original name">
+                        <small class="form-text text-muted">Override the playlist name on Spotify</small>
+                    </div>
+                    
+                    <button id="startSyncBtn" class="btn btn-success" disabled>
+                        <i class="bi bi-arrow-repeat"></i> Start Sync
+                    </button>
+                </div>
+                
+                <div id="sync-progress" style="display: none;">
+                    <div class="progress mb-3" style="height: 30px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%">0%</div>
+                    </div>
+                    
+                    <div id="statusText" class="alert alert-info">
+                        Initializing...
+                    </div>
+                    
+                    <div id="logContainer" class="border rounded p-3" style="max-height: 400px; overflow-y: auto; background: #f8f9fa;">
+                        <div id="logMessages"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let ytPlaylists = [];
+
+// Fetch YouTube Music playlists
+async function fetchPlaylists() {
+    try {
+        const response = await fetch('/ytmusic/api/playlists');
+        const data = await response.json();
+        
+        if (data.error) {
+            alert('Error loading playlists: ' + data.error);
+            return;
+        }
+        
+        ytPlaylists = data.playlists;
+        const select = document.getElementById('playlistSelect');
+        select.innerHTML = '<option value="">-- Select a playlist --</option>';
+        
+        ytPlaylists.forEach(pl => {
+            const option = document.createElement('option');
+            option.value = pl.id;
+            option.textContent = `${pl.name} (${pl.track_count} tracks)`;
+            select.appendChild(option);
+        });
+        
+        select.disabled = false;
+        document.getElementById('startSyncBtn').disabled = false;
+    } catch (error) {
+        console.error('Error fetching playlists:', error);
+        alert('Failed to load playlists');
+    }
+}
+
+// Start sync
+document.getElementById('startSyncBtn').addEventListener('click', () => {
+    const select = document.getElementById('playlistSelect');
+    const playlistId = select.value;
+    const playlistName = document.getElementById('playlistName').value;
+    
+    if (!playlistId) {
+        alert('Please select a playlist');
+        return;
+    }
+    
+    // Hide setup, show progress
+    document.getElementById('sync-setup').style.display = 'none';
+    document.getElementById('sync-progress').style.display = 'block';
+    
+    // Build URL
+    let url = `/sync/start-ytmusic-to-spotify?playlist_id=${encodeURIComponent(playlistId)}`;
+    if (playlistName) {
+        url += `&name=${encodeURIComponent(playlistName)}`;
+    }
+    
+    // Start EventSource
+    const eventSource = new EventSource(url);
+    
+    eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        updateProgress(data);
+    };
+    
+    eventSource.addEventListener('complete', (event) => {
+        const data = JSON.parse(event.data);
+        updateProgress(data);
+        eventSource.close();
+        
+        document.getElementById('statusText').className = 'alert alert-success';
+        setTimeout(() => {
+            if (confirm('Sync complete! Go back to dashboard?')) {
+                window.location.href = '/dashboard';
+            }
+        }, 2000);
+    });
+    
+    eventSource.addEventListener('error', (event) => {
+        let message = 'An error occurred';
+        if (event.data) {
+            const data = JSON.parse(event.data);
+            message = data.message || message;
+        }
+        
+        document.getElementById('statusText').className = 'alert alert-danger';
+        document.getElementById('statusText').textContent = 'Error: ' + message;
+        eventSource.close();
+    });
+    
+    eventSource.onerror = () => {
+        if (eventSource.readyState === EventSource.CLOSED) {
+            console.log('EventSource closed');
+        }
+    };
+});
+
+function updateProgress(data) {
+    if (data.percent !== undefined) {
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = data.percent + '%';
+        progressBar.textContent = Math.round(data.percent) + '%';
+    }
+    
+    if (data.status) {
+        document.getElementById('statusText').textContent = data.status;
+    }
+    
+    if (data.message) {
+        const logMessages = document.getElementById('logMessages');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'mb-1';
+        
+        if (data.type === 'success') {
+            msgDiv.className += ' text-success';
+        } else if (data.type === 'danger') {
+            msgDiv.className += ' text-danger';
+        } else if (data.type === 'warning') {
+            msgDiv.className += ' text-warning';
+        }
+        
+        msgDiv.textContent = data.message;
+        logMessages.appendChild(msgDiv);
+        
+        // Auto-scroll
+        document.getElementById('logContainer').scrollTop = 
+            document.getElementById('logContainer').scrollHeight;
+    }
+}
+
+// Load playlists on page load
+fetchPlaylists();
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Spotify Callback{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center p-5">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5>Connecting Spotify...</h5>
+                <p id="status">Please wait...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    // Extract access token from URL fragment
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
+    const expiresIn = params.get('expires_in');
+    const error = params.get('error');
+
+    console.log('Full URL:', window.location.href);
+    console.log('Callback URL hash:', hash);
+    console.log('Access token:', accessToken ? 'Found (length: ' + accessToken.length + ')' : 'Not found');
+    console.log('Expires in:', expiresIn);
+    console.log('Error:', error);
+
+    // Check for errors
+    if (error) {
+        document.getElementById('status').textContent = 'Authorization failed: ' + error;
+        console.error('Spotify auth error:', error);
+        setTimeout(() => {
+            window.location.href = '{{ url_for("spotify.auth") }}';
+        }, 3000);
+        return;
+    }
+
+    if (accessToken) {
+        // Save token to backend
+        document.getElementById('status').textContent = 'Saving token...';
+        fetch('{{ url_for("spotify.save_token") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                access_token: accessToken,
+                expires_in: expiresIn
+            })
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                document.getElementById('status').textContent = 'Success! Redirecting...';
+                setTimeout(() => {
+                    window.location.href = '{{ url_for("dashboard") }}';
+                }, 1000);
+            } else {
+                document.getElementById('status').textContent = 'Error: ' + data.error;
+                console.error('Save failed:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            document.getElementById('status').textContent = 'Error: ' + error.message;
+        });
+    } else {
+        console.error('No access token in URL');
+        document.getElementById('status').textContent = 'No access token found in callback. Check redirect URI configuration.';
+        setTimeout(() => {
+            window.location.href = '{{ url_for("spotify.auth") }}';
+        }, 5000);
+    }
+})();
+</script>
+{% endblock %}

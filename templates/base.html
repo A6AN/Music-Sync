@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Music Sync{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            /* On Fire Color Palette */
+            --cream: #FFFB97;
+            --light-orange: #FE7F42;
+            --bright-red: #B32C1A;
+            --brown: #7A4B47;
+            --dark: #2A1617;
+            
+            --spotify-green: #1DB954;
+            --youtube-red: #FF0000;
+            --gradient-start: #FFFB97;
+            --gradient-end: #B32C1A;
+        }
+        
+        * {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--light-orange) 50%, var(--bright-red) 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(254, 127, 66, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(179, 44, 26, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 90%, rgba(255, 251, 151, 0.2) 0%, transparent 40%);
+            animation: gradientShift 15s ease infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .navbar {
+            background: rgba(42, 22, 23, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(254, 127, 66, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--cream), var(--light-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            position: relative;
+            color: rgba(255, 251, 151, 0.9) !important;
+        }
+        
+        .nav-link:hover {
+            color: var(--light-orange) !important;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cream), var(--light-orange));
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        main {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 20px 60px rgba(42, 22, 23, 0.15),
+                0 0 1px rgba(42, 22, 23, 0.1);
+            overflow: hidden;
+            transform: translateY(0);
+            animation: cardFadeIn 0.6s ease-out;
+        }
+        
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 30px 80px rgba(42, 22, 23, 0.2),
+                0 0 1px rgba(42, 22, 23, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--bright-red), var(--light-orange)) !important;
+            border: none;
+            padding: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--bright-red), var(--light-orange));
+            box-shadow: 0 8px 20px rgba(179, 44, 26, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--light-orange), var(--bright-red));
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(179, 44, 26, 0.4);
+        }
+        
+        .btn-spotify {
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            color: white;
+            box-shadow: 0 8px 20px rgba(29, 185, 84, 0.3);
+        }
+        
+        .btn-spotify:hover {
+            background: linear-gradient(135deg, #1ed760, #1DB954);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(29, 185, 84, 0.4);
+        }
+        
+        .btn-youtube {
+            background: linear-gradient(135deg, #FF0000, #ff3333);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+        }
+        
+        .btn-youtube:hover {
+            background: linear-gradient(135deg, #ff3333, #FF0000);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(255, 0, 0, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--cream), var(--light-orange));
+            color: var(--dark);
+            box-shadow: 0 8px 20px rgba(254, 127, 66, 0.3);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, var(--light-orange), var(--cream));
+            color: var(--dark);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(254, 127, 66, 0.4);
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            animation: slideInDown 0.5s ease-out;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, rgba(255, 251, 151, 0.9), rgba(254, 127, 66, 0.3));
+            color: var(--dark);
+            border-left: 4px solid var(--bright-red);
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(254, 127, 66, 0.2), rgba(179, 44, 26, 0.1));
+            color: var(--dark);
+            border-left: 4px solid var(--light-orange);
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(179, 44, 26, 0.2), rgba(122, 75, 71, 0.1));
+            color: var(--dark);
+            border-left: 4px solid var(--bright-red);
+        }
+        
+        .progress {
+            height: 30px;
+            border-radius: 15px;
+            background: rgba(122, 75, 71, 0.2);
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--cream), var(--light-orange), var(--bright-red));
+            background-size: 200% 100%;
+            animation: progressShine 2s linear infinite;
+        }
+        
+        @keyframes progressShine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .service-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-badge.spotify {
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            color: white;
+        }
+        
+        .service-badge.youtube {
+            background: linear-gradient(135deg, #FF0000, #ff3333);
+            color: white;
+        }
+        
+        footer {
+            background: rgba(42, 22, 23, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(254, 127, 66, 0.2);
+            color: rgba(255, 251, 151, 0.9) !important;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--dark), var(--bright-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .table {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .table thead {
+            background: linear-gradient(135deg, var(--bright-red), var(--light-orange));
+            color: white;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .table tbody tr:hover {
+            background: rgba(254, 127, 66, 0.1);
+            transform: scale(1.01);
+        }
+        
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .dropdown-menu {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(42, 22, 23, 0.2);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, rgba(255, 251, 151, 0.3), rgba(254, 127, 66, 0.2));
+            color: var(--dark);
+            border-radius: 12px;
+        }
+        
+        input, select, textarea {
+            border-radius: 12px !important;
+            border: 2px solid rgba(122, 75, 71, 0.2) !important;
+            padding: 0.75rem 1rem !important;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--light-orange) !important;
+            box-shadow: 0 0 0 4px rgba(254, 127, 66, 0.1) !important;
+        }
+        
+        /* Pulse animation for icons */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .bi {
+            display: inline-block;
+        }
+        
+        .card-header .bi {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-music-note-beamed"></i> Music Sync
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('sync.history') }}">History</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <form method="POST" action="{{ url_for('auth.logout') }}" style="margin: 0;">
+                                        <button type="submit" class="dropdown-item" style="background: none; border: none; cursor: pointer; text-align: left; width: 100%;">
+                                            <i class="bi bi-box-arrow-right"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-4">
+        <div class="container">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="mt-auto py-3 bg-dark text-white">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Music Sync - Sync your music across platforms</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

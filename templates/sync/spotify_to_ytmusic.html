@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Sync Spotify to YouTube Music{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-spotify"></i> → <i class="bi bi-youtube"></i>
+                        Sync Spotify to YouTube Music
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="syncForm">
+                        <div class="mb-3">
+                            <label for="playlistSelect" class="form-label">Select Playlist</label>
+                            <select class="form-select" id="playlistSelect" required>
+                                <option value="">Loading playlists...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="playlistName" class="form-label">New Playlist Name (optional)</label>
+                            <input type="text" class="form-control" id="playlistName" 
+                                   placeholder="Leave empty to use original name">
+                            <small class="form-text text-muted">
+                                If empty, will use the original Spotify playlist name
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="searchAlgo" class="form-label">Search Algorithm</label>
+                            <select class="form-select" id="searchAlgo">
+                                <option value="0">First result (fastest)</option>
+                                <option value="1" selected>Exact match</option>
+                                <option value="2">Fuzzy match (slowest, most accurate)</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="syncBtn">
+                            <i class="bi bi-arrow-right-circle"></i> Start Sync
+                        </button>
+                    </form>
+                    
+                    <div id="progressContainer" class="mt-4" style="display: none;">
+                        <h5>Sync Progress</h5>
+                        <div class="progress mb-2">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div id="progressText" class="text-muted">Initializing...</div>
+                        <div id="progressLog" class="mt-3 p-3 bg-light rounded" style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.85rem;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <a href="{{ url_for('spotify.playlists') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Playlists
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Load playlists
+fetch('/spotify/playlists-data')
+    .then(r => r.json())
+    .then(data => {
+        const select = document.getElementById('playlistSelect');
+        select.innerHTML = '<option value="">-- Select a playlist --</option>';
+        data.forEach(pl => {
+            const option = document.createElement('option');
+            option.value = pl.id;
+            option.textContent = `${pl.name} (${pl.tracks.total} tracks)`;
+            select.appendChild(option);
+        });
+        
+        // Pre-select from URL param
+        const urlParams = new URLSearchParams(window.location.search);
+        const playlistId = urlParams.get('playlist_id');
+        if (playlistId) {
+            select.value = playlistId;
+        }
+    })
+    .catch(err => {
+        document.getElementById('playlistSelect').innerHTML = 
+            '<option value="">Error loading playlists</option>';
+    });
+
+// Handle form submission
+document.getElementById('syncForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const playlistId = document.getElementById('playlistSelect').value;
+    const playlistName = document.getElementById('playlistName').value;
+    const searchAlgo = document.getElementById('searchAlgo').value;
+    
+    if (!playlistId) {
+        alert('Please select a playlist');
+        return;
+    }
+    
+    // Show progress container
+    document.getElementById('progressContainer').style.display = 'block';
+    document.getElementById('syncBtn').disabled = true;
+    document.getElementById('syncBtn').innerHTML = 
+        '<span class="spinner-border spinner-border-sm"></span> Syncing...';
+    
+    // Start sync via Server-Sent Events
+    const eventSource = new EventSource(
+        `/sync/start?playlist_id=${playlistId}&name=${encodeURIComponent(playlistName)}&algo=${searchAlgo}`
+    );
+    
+    eventSource.addEventListener('progress', function(e) {
+        const data = JSON.parse(e.data);
+        updateProgress(data);
+    });
+    
+    eventSource.addEventListener('complete', function(e) {
+        const data = JSON.parse(e.data);
+        updateProgress(data);
+        eventSource.close();
+        document.getElementById('syncBtn').disabled = false;
+        document.getElementById('syncBtn').innerHTML = 
+            '<i class="bi bi-check-circle"></i> Sync Complete!';
+        setTimeout(() => {
+            document.getElementById('syncBtn').innerHTML = 
+                '<i class="bi bi-arrow-right-circle"></i> Start Sync';
+        }, 3000);
+    });
+    
+    eventSource.addEventListener('error', function(e) {
+        console.error('EventSource error:', e);
+        eventSource.close();
+        document.getElementById('syncBtn').disabled = false;
+        document.getElementById('syncBtn').innerHTML = 
+            '<i class="bi bi-arrow-right-circle"></i> Start Sync';
+        addLog('Error: Sync failed', 'danger');
+    });
+});
+
+function updateProgress(data) {
+    if (data.percent !== undefined) {
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = data.percent + '%';
+        progressBar.textContent = Math.round(data.percent) + '%';
+    }
+    
+    if (data.status) {
+        document.getElementById('progressText').textContent = data.status;
+    }
+    
+    if (data.message) {
+        addLog(data.message, data.type || 'info');
+    }
+}
+
+function addLog(message, type = 'info') {
+    const logDiv = document.getElementById('progressLog');
+    const entry = document.createElement('div');
+    entry.className = `text-${type === 'success' ? 'success' : type === 'danger' ? 'danger' : 'secondary'}`;
+    entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    logDiv.appendChild(entry);
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+</script>
+{% endblock %}
+{% endblock %}

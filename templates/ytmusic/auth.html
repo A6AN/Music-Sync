@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Connect YouTube Music{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-youtube"></i> Connect YouTube Music
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <h5>Step 1: Get Your Headers</h5>
+                <ol>
+                    <li>Open <a href="https://music.youtube.com" target="_blank">YouTube Music</a> in Firefox (recommended)</li>
+                    <li>Make sure you're logged in to your account</li>
+                    <li>Press <kbd>F12</kbd> to open Developer Tools</li>
+                    <li>Go to the <strong>Network</strong> tab</li>
+                    <li>Filter by <code>/browse</code></li>
+                    <li>Click on any request that appears</li>
+                    <li>In the request details, find <strong>Request Headers</strong></li>
+                    <li>Click the <strong>RAW</strong> toggle button to view raw headers</li>
+                    <li>Right-click and <strong>Select All</strong>, then copy</li>
+                </ol>
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Important:</strong> Your headers contain authentication cookies. Keep them secure and don't share them with anyone!
+                </div>
+
+                <h5 class="mt-4">Step 2: Paste Headers Below</h5>
+                <form method="POST" action="{{ url_for('ytmusic.upload_headers') }}">
+                    <div class="mb-3">
+                        <label for="raw_headers" class="form-label">Raw Request Headers</label>
+                        <textarea 
+                            class="form-control font-monospace" 
+                            id="raw_headers" 
+                            name="raw_headers" 
+                            rows="15" 
+                            required
+                            placeholder="Paste your raw headers here..."></textarea>
+                        <div class="form-text">
+                            Should include headers like: cookie, x-goog-authuser, authorization, etc.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-youtube">
+                        <i class="bi bi-youtube"></i> Connect YouTube Music
+                    </button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

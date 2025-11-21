@@ -1,3 +1,24 @@
+# Music Sync - Git Ignore File
+
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+*.env
+
+# API Credentials
+oauth.json
+raw_headers.txt
+spotify_credentials.json
+ytmusic_credentials.json
+playlists.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+music_sync.db
+data/music_sync.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -130,12 +151,56 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+.env.production
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# Logs
+*.log
+logs/
+
+# Backups
+backups/
+*.backup
+*.bak
+
+# Docker volumes
+data/
+docker-data/
+
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+
+# SSH keys
+key*.key
 
 # Spyder project settings
 .spyderproject
@@ -170,7 +235,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-# sensitive info
+
+# Project-specific sensitive files
 oauth.json
 raw_headers.txt
 playlists.json
+settings.json
+music_sync.db

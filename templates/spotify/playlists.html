@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Spotify Playlists{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-spotify text-success"></i> Your Spotify Playlists</h2>
+            <p class="text-muted">Select playlists to sync to YouTube Music</p>
+        </div>
+    </div>
+
+    {% if playlists %}
+    <div class="row">
+        {% for playlist in playlists %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if playlist.images and playlist.images|length > 0 %}
+                <img src="{{ playlist.images[0].url }}" class="card-img-top" alt="{{ playlist.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-music-note-list" style="font-size: 4rem; color: rgba(255,255,255,0.5);"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ playlist.name }}</h5>
+                    <p class="card-text text-muted">
+                        <small>{{ playlist.tracks.total }} tracks</small>
+                        {% if playlist.owner %}
+                        <br><small>by {{ playlist.owner.display_name }}</small>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('sync.spotify_to_ytmusic') }}?playlist_id={{ playlist.id }}" 
+                       class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-arrow-right-circle"></i> Sync to YouTube Music
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No playlists found. 
+        <a href="{{ url_for('spotify.backup') }}" class="alert-link">Click here to fetch your playlists</a>
+    </div>
+    {% endif %}
+
+    <div class="row mt-4">
+        <div class="col">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+            <button onclick="fetchPlaylists()" class="btn btn-success">
+                <i class="bi bi-arrow-clockwise"></i> Refresh Playlists
+            </button>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function fetchPlaylists() {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Fetching...';
+    
+    fetch('{{ url_for("spotify.backup") }}', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh Playlists';
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh Playlists';
+    });
+}
+</script>
+{% endblock %}
+{% endblock %}

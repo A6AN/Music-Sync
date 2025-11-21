@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Sync History{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h2><i class="bi bi-clock-history"></i> Sync History</h2>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                {% if history %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Playlist</th>
+                                    <th>Direction</th>
+                                    <th>Status</th>
+                                    <th>Tracks</th>
+                                    <th>Started</th>
+                                    <th>Completed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sync in history %}
+                                <tr>
+                                    <td><span class="badge bg-secondary">{{ sync.sync_type }}</span></td>
+                                    <td>{{ sync.playlist_name or '-' }}</td>
+                                    <td>
+                                        {% if sync.direction == 'spotify_to_ytmusic' %}
+                                            <i class="bi bi-spotify"></i> → <i class="bi bi-youtube"></i> Spotify to YTMusic
+                                        {% elif sync.direction == 'ytmusic_to_spotify' %}
+                                            <i class="bi bi-youtube"></i> → <i class="bi bi-spotify"></i> YTMusic to Spotify
+                                        {% else %}
+                                            {{ sync.direction or '-' }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if sync.status == 'completed' else 'danger' if sync.status == 'failed' else 'warning' }}">
+                                            {{ sync.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ sync.tracks_synced }}/{{ sync.tracks_total }}</td>
+                                    <td>{{ sync.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ sync.completed_at.strftime('%Y-%m-%d %H:%M') if sync.completed_at else '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No sync history yet. Start syncing your music!</p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
