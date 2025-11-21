@@ -6,7 +6,13 @@
 
 A beautiful, production-ready web application for seamlessly syncing playlists between music streaming platforms. Currently supports **Spotify ↔ YouTube Music** with a roadmap for Apple Music, Amazon Music, and Tidal.
 
-**Live Demo:** [https://mymusicsync.duckdns.org](https://mymusicsync.duckdns.org)
+## 🌐 Live Instance
+
+**Try it now:** [https://mymusicsync.duckdns.org](https://mymusicsync.duckdns.org)
+
+No installation required! Just register an account and start syncing your playlists. The live instance is fully functional and ready to use.
+
+> **Note:** You can also deploy your own private instance following the instructions below.
 
 ## ✨ Features
 
