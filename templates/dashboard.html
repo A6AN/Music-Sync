@@ -9,18 +9,19 @@
         padding: 3rem 0;
         animation: fadeInUp 0.8s ease-out;
     }
-    
+
     @keyframes fadeInUp {
         from {
             opacity: 0;
             transform: translateY(30px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
-    
+
     .hero-title {
         font-size: 3rem;
         font-weight: 900;
@@ -32,17 +33,24 @@
         animation: shimmer 3s ease-in-out infinite;
         background-size: 200% auto;
     }
-    
+
     @keyframes shimmer {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
+
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
     }
-    
+
     .service-card {
         position: relative;
         overflow: hidden;
     }
-    
+
     .service-card::before {
         content: '';
         position: absolute;
@@ -53,33 +61,40 @@
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
         transition: left 0.5s;
     }
-    
+
     .service-card:hover::before {
         left: 100%;
     }
-    
+
     .sync-card {
         border: 3px dashed rgba(179, 44, 26, 0.3);
         background: linear-gradient(135deg, rgba(255, 251, 151, 0.1), rgba(254, 127, 66, 0.05));
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     .sync-card:hover {
         border-color: var(--bright-red);
         background: linear-gradient(135deg, rgba(255, 251, 151, 0.2), rgba(254, 127, 66, 0.1));
         transform: scale(1.05);
     }
-    
+
     .sync-arrow {
         font-size: 3rem;
         animation: bounce 2s ease-in-out infinite;
     }
-    
+
     @keyframes bounce {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(10px); }
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        50% {
+            transform: translateX(10px);
+        }
     }
-    
+
     .stat-card {
         text-align: center;
         padding: 2rem;
@@ -87,7 +102,7 @@
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(42, 22, 23, 0.1);
     }
-    
+
     .stat-number {
         font-size: 3rem;
         font-weight: 900;
@@ -111,39 +126,40 @@
     <!-- Spotify Card -->
     <div class="col-md-6 mb-4">
         <div class="card h-100 service-card">
-            <div class="card-header text-white" style="background: linear-gradient(135deg, #1DB954, #1ed760) !important;">
+            <div class="card-header text-white"
+                style="background: linear-gradient(135deg, #1DB954, #1ed760) !important;">
                 <h4 class="mb-0">
                     <i class="bi bi-spotify"></i> Spotify
                 </h4>
             </div>
             <div class="card-body">
                 {% if user.spotify_creds and user.spotify_creds.is_valid() %}
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-circle-fill"></i> <strong>Connected & Active</strong>
-                    </div>
-                    
-                    <div class="d-grid gap-3">
-                        <a href="{{ url_for('spotify.playlists') }}" class="btn btn-success">
-                            <i class="bi bi-list-ul"></i> View Playlists
-                        </a>
-                        <button class="btn btn-outline-success" onclick="backupSpotify()">
-                            <i class="bi bi-download"></i> Backup Playlists
-                        </button>
-                        <form method="POST" action="{{ url_for('spotify.disconnect') }}" class="d-inline">
-                            <button type="submit" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-x-circle"></i> Disconnect
-                            </button>
-                        </form>
-                    </div>
-                {% else %}
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Not Connected</strong>
-                        <p class="mb-0 mt-2 small">Connect your Spotify account to start syncing</p>
-                    </div>
-                    
-                    <a href="{{ url_for('spotify.auth') }}" class="btn btn-spotify w-100 btn-lg">
-                        <i class="bi bi-spotify"></i> Connect Spotify
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i> <strong>Connected & Active</strong>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('spotify.playlists') }}" class="btn btn-success">
+                        <i class="bi bi-list-ul"></i> View Playlists
                     </a>
+                    <button class="btn btn-outline-success" onclick="backupSpotify()">
+                        <i class="bi bi-download"></i> Backup Playlists
+                    </button>
+                    <form method="POST" action="{{ url_for('spotify.disconnect') }}" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-x-circle"></i> Disconnect
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>Not Connected</strong>
+                    <p class="mb-0 mt-2 small">Connect your Spotify account to start syncing</p>
+                </div>
+
+                <a href="{{ url_for('spotify.auth') }}" class="btn btn-spotify w-100 btn-lg">
+                    <i class="bi bi-spotify"></i> Connect Spotify
+                </a>
                 {% endif %}
             </div>
         </div>
@@ -152,33 +168,69 @@
     <!-- YouTube Music Card -->
     <div class="col-md-6 mb-4">
         <div class="card h-100 service-card">
-            <div class="card-header text-white" style="background: linear-gradient(135deg, #FF0000, #ff3333) !important;">
+            <div class="card-header text-white"
+                style="background: linear-gradient(135deg, #FF0000, #ff3333) !important;">
                 <h4 class="mb-0">
                     <i class="bi bi-youtube"></i> YouTube Music
                 </h4>
             </div>
             <div class="card-body">
                 {% if user.ytmusic_creds %}
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-circle-fill"></i> <strong>Connected & Active</strong>
-                    </div>
-                    
-                    <div class="d-grid gap-3">
-                        <form method="POST" action="{{ url_for('ytmusic.disconnect') }}" class="d-inline">
-                            <button type="submit" class="btn btn-outline-danger w-100">
-                                <i class="bi bi-x-circle"></i> Disconnect
-                            </button>
-                        </form>
-                    </div>
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i> <strong>Connected & Active</strong>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <form method="POST" action="{{ url_for('ytmusic.disconnect') }}" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-x-circle"></i> Disconnect
+                        </button>
+                    </form>
+                </div>
                 {% else %}
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Not Connected</strong>
-                        <p class="mb-0 mt-2 small">Connect YouTube Music to enable syncing</p>
-                    </div>
-                    
-                    <a href="{{ url_for('ytmusic.auth') }}" class="btn btn-youtube w-100 btn-lg">
-                        <i class="bi bi-youtube"></i> Connect YouTube Music
-                    </a>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>Not Connected</strong>
+                    <p class="mb-0 mt-2 small">Connect YouTube Music to enable syncing</p>
+                </div>
+
+                <a href="{{ url_for('ytmusic.auth') }}" class="btn btn-youtube w-100 btn-lg">
+                    <i class="bi bi-youtube"></i> Connect YouTube Music
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- Apple Music Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 service-card">
+            <div class="card-header text-white"
+                style="background: linear-gradient(135deg, #fa243c, #fd5164) !important;">
+                <h4 class="mb-0">
+                    <i class="bi bi-apple"></i> Apple Music
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if user.applemusic_creds and user.applemusic_creds.is_valid() %}
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i> <strong>Connected & Active</strong>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <form method="POST" action="{{ url_for('applemusic.disconnect') }}" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-x-circle"></i> Disconnect
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>Not Connected</strong>
+                    <p class="mb-0 mt-2 small">Connect Apple Music manually to enable syncing</p>
+                </div>
+
+                <a href="{{ url_for('applemusic.auth') }}" class="btn btn-danger w-100 btn-lg">
+                    <i class="bi bi-apple"></i> Connect Apple Music
+                </a>
                 {% endif %}
             </div>
         </div>
@@ -186,7 +238,8 @@
 </div>
 
 <!-- Sync Options -->
-{% if user.spotify_creds and user.spotify_creds.is_valid() and user.ytmusic_creds %}
+{% if (user.spotify_creds and user.spotify_creds.is_valid()) or user.ytmusic_creds or (user.applemusic_creds and
+user.applemusic_creds.is_valid()) %}
 <div class="row mt-5">
     <div class="col-12 text-center mb-4">
         <h2><i class="bi bi-arrow-repeat"></i> Start Syncing</h2>
@@ -226,6 +279,38 @@
             </div>
         </div>
     </div>
+    <div class="col-md-6">
+        <div class="card sync-card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size: 4rem; margin: 1rem 0;">
+                    <i class="bi bi-spotify" style="color: #1DB954;"></i>
+                    <span class="sync-arrow">→</span>
+                    <i class="bi bi-apple" style="color: #fa243c;"></i>
+                </div>
+                <h3 class="mb-3">Spotify to Apple Music</h3>
+                <p class="text-muted mb-4">Transfer your Spotify playlists to Apple Music</p>
+                <a href="{{ url_for('sync.spotify_to_applemusic') }}" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-arrow-right-circle"></i> Start Sync
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card sync-card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size: 4rem; margin: 1rem 0;">
+                    <i class="bi bi-apple" style="color: #fa243c;"></i>
+                    <span class="sync-arrow">→</span>
+                    <i class="bi bi-spotify" style="color: #1DB954;"></i>
+                </div>
+                <h3 class="mb-3">Apple Music to Spotify</h3>
+                <p class="text-muted mb-4">Transfer your Apple Music playlists to Spotify</p>
+                <a href="{{ url_for('sync.applemusic_to_spotify') }}" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-arrow-right-circle"></i> Start Sync
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endif %}
 
@@ -240,43 +325,46 @@
             </div>
             <div class="card-body">
                 {% if user.sync_history %}
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Direction</th>
-                                    <th>Status</th>
-                                    <th>Tracks</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for sync in user.sync_history[:5] %}
-                                <tr>
-                                    <td>{{ sync.sync_type }}</td>
-                                    <td>
-                                        {% if sync.direction == 'to_ytmusic' %}
-                                            <i class="bi bi-spotify"></i> → <i class="bi bi-youtube"></i>
-                                        {% else %}
-                                            <i class="bi bi-youtube"></i> → <i class="bi bi-spotify"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{{ 'success' if sync.status == 'completed' else 'danger' if sync.status == 'failed' else 'warning' }}">
-                                            {{ sync.status }}
-                                        </span>
-                                    </td>
-                                    <td>{{ sync.tracks_synced }}/{{ sync.tracks_total }}</td>
-                                    <td>{{ sync.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <a href="{{ url_for('sync.history') }}" class="btn btn-sm btn-outline-primary">View All History</a>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Direction</th>
+                                <th>Status</th>
+                                <th>Tracks</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sync in user.sync_history[:5] %}
+                            <tr>
+                                <td>{{ sync.sync_type }}</td>
+                                <td>
+                                    {% if sync.direction == 'to_ytmusic' %}
+                                    <i class="bi bi-spotify"></i> → <i class="bi bi-youtube"></i>
+                                    {% elif sync.direction == 'to_applemusic' %}
+                                    <i class="bi bi-spotify"></i> → <i class="bi bi-apple"></i>
+                                    {% else %}
+                                    <i class="bi bi-youtube"></i> → <i class="bi bi-spotify"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge bg-{{ 'success' if sync.status == 'completed' else 'danger' if sync.status == 'failed' else 'warning' }}">
+                                        {{ sync.status }}
+                                    </span>
+                                </td>
+                                <td>{{ sync.tracks_synced }}/{{ sync.tracks_total }}</td>
+                                <td>{{ sync.started_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{{ url_for('sync.history') }}" class="btn btn-sm btn-outline-primary">View All History</a>
                 {% else %}
-                    <p class="text-muted mb-0">No sync history yet. Start syncing your music!</p>
+                <p class="text-muted mb-0">No sync history yet. Start syncing your music!</p>
                 {% endif %}
             </div>
         </div>
@@ -286,29 +374,29 @@
 
 {% block extra_js %}
 <script>
-async function backupSpotify() {
-    const button = event.target;
-    button.disabled = true;
-    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Backing up...';
-    
-    try {
-        const response = await fetch('{{ url_for("spotify.backup") }}', {
-            method: 'POST'
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-            alert('Backup completed! ' + data.playlists_count + ' playlists backed up.');
-            location.reload();
-        } else {
-            alert('Backup failed: ' + data.error);
+    async function backupSpotify() {
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Backing up...';
+
+        try {
+            const response = await fetch('{{ url_for("spotify.backup") }}', {
+                method: 'POST'
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Backup completed! ' + data.playlists_count + ' playlists backed up.');
+                location.reload();
+            } else {
+                alert('Backup failed: ' + data.error);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            button.disabled = false;
+            button.innerHTML = '<i class="bi bi-download"></i> Backup Playlists';
         }
-    } catch (error) {
-        alert('Error: ' + error.message);
-    } finally {
-        button.disabled = false;
-        button.innerHTML = '<i class="bi bi-download"></i> Backup Playlists';
     }
-}
 </script>
 {% endblock %}

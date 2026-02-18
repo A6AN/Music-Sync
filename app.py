@@ -62,6 +62,7 @@ class User(UserMixin, db.Model):
     
     spotify_creds = db.relationship('SpotifyCredentials', backref='user', uselist=False, cascade='all, delete-orphan')
     ytmusic_creds = db.relationship('YTMusicCredentials', backref='user', uselist=False, cascade='all, delete-orphan')
+    applemusic_creds = db.relationship('AppleMusicCredentials', backref='user', uselist=False, cascade='all, delete-orphan')
     sync_history = db.relationship('SyncHistory', backref='user', cascade='all, delete-orphan', order_by='SyncHistory.started_at.desc()')
 
 
@@ -103,6 +104,25 @@ class YTMusicCredentials(db.Model):
         self.headers_json = json.dumps(headers_dict)
 
 
+class AppleMusicCredentials(db.Model):
+    """Apple Music credentials per user (Developer + User Token)"""
+    __tablename__ = 'applemusic_credentials'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
+    
+    # User Token (media-user-token from cookie)
+    music_user_token = db.Column(db.Text)
+    
+    # Developer Token (Authorization bearer token from header)
+    developer_token = db.Column(db.Text)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def is_valid(self):
+        # Basic check if we have necessary tokens
+        return bool(self.music_user_token and self.developer_token)
 class SyncHistory(db.Model):
     """Track sync operations"""
     __tablename__ = 'sync_history'
@@ -127,6 +147,7 @@ class SyncHistory(db.Model):
 app.User = User
 app.SpotifyCredentials = SpotifyCredentials  
 app.YTMusicCredentials = YTMusicCredentials
+app.AppleMusicCredentials = AppleMusicCredentials
 app.SyncHistory = SyncHistory
 app.db = db
 app.bcrypt = bcrypt
@@ -137,6 +158,8 @@ from routes import auth, spotify, ytmusic, sync
 app.register_blueprint(auth.bp)
 app.register_blueprint(spotify.bp)
 app.register_blueprint(ytmusic.bp)
+from routes import applemusic
+app.register_blueprint(applemusic.bp)
 app.register_blueprint(sync.bp)
 
 
@@ -202,6 +225,6 @@ if __name__ == '__main__':
     
     debug_mode = os.environ.get('FLASK_ENV') == 'development'
     host = os.environ.get('FLASK_HOST', '0.0.0.0')
-    port = int(os.environ.get('FLASK_PORT', 5000))
+    port = int(os.environ.get('FLASK_PORT', 5001))
     
     app.run(host=host, port=port, debug=debug_mode)

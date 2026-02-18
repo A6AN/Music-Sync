@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header bg-danger text-white">
+                <h3 class="text-center font-weight-light my-2">Connect Apple Music</h3>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% if creds and creds.is_valid() %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> Apple Music is connected!
+                    </div>
+                    <form action="{{ url_for('applemusic.disconnect') }}" method="POST" class="mb-4">
+                        <button type="submit" class="btn btn-warning w-100">Disconnect Account</button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle"></i> Manual Connection Required</h5>
+                        <p>To avoid the $99/year Developer fee, we use a manual token extraction method. This is safe and runs locally.</p>
+                    </div>
+                {% endif %}
+
+                <h5 class="mt-4">How to get your tokens:</h5>
+                <ol>
+                    <li>Open <a href="https://music.apple.com" target="_blank">Apple Music Web Player</a> and log in.</li>
+                    <li>Open Developer Tools (F12 or Right Click -> Inspect).</li>
+                    <li>Go to the <strong>Network</strong> tab.</li>
+                    <li>Play any song or browse an album.</li>
+                    <li>Look for a request to <code>api.music.apple.com</code> (e.g., <code>search</code>, <code>storefronts</code>).</li>
+                    <li>Click on the request and look at the <strong>Request Headers</strong>.</li>
+                    <li>Copy the value of <code>Authorization</code> (starts with <code>Bearer ...</code>) -> paste into <strong>Developer Token</strong>.</li>
+                    <li>Copy the value of <code>Music-User-Token</code> (starts with <code>As...</code> or similar) -> paste into <strong>Music User Token</strong>.</li>
+                </ol>
+
+                <form action="{{ url_for('applemusic.save_settings') }}" method="POST">
+                    <div class="form-group mb-3">
+                        <label for="developer_token">Authorization (Bearer Token)</label>
+                        <input type="text" class="form-control" id="developer_token" name="developer_token" 
+                               placeholder="Bearer eyJhbGciOiJFUzI1NiIsIm..." required
+                               value="{{ creds.developer_token if creds else '' }}">
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="music_user_token">Music-User-Token</label>
+                        <input type="text" class="form-control" id="music_user_token" name="music_user_token" 
+                               placeholder="As..." required
+                               value="{{ creds.music_user_token if creds else '' }}">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-danger w-100">Save & Connect</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

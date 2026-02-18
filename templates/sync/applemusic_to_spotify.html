@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Sync Apple Music to Spotify{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-apple"></i> Apple Music → <i class="bi bi-spotify"></i> Spotify
+                </h4>
+            </div>
+            <div class="card-body">
+                <div id="sync-setup">
+                    <p class="text-muted">Select an Apple Music playlist to sync to Spotify</p>
+
+                    <div class="mb-3">
+                        <label for="playlistSelect" class="form-label">Select Playlist (Enter ID manually for
+                            now)</label>
+                        <!-- 
+                            Apple Music API users playlist listing can be tricky without full storefront/library 
+                            capabilities fully fleshed out. For Manual Token method, fetching all playlists is possible
+                            but for this MVP iteration, manual ID entry acts as a fallback or a simpler list.
+                            
+                            However, our backend client *does* have get_user_playlists. Let's try to populate it.
+                         -->
+                        <select class="form-select" id="playlistSelect" disabled>
+                            <option value="">Loading playlists...</option>
+                        </select>
+                        <small class="text-muted">If your playlist isn't listed, you can enter the ID below:</small>
+                        <input type="text" class="form-control mt-2" id="playlistIdInput"
+                            placeholder="e.g. p.AuTheNtIcId">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="playlistName" class="form-label">Playlist Name (Optional)</label>
+                        <input type="text" class="form-control" id="playlistName"
+                            placeholder="Leave blank to use original name">
+                        <small class="form-text text-muted">Override the playlist name on Spotify</small>
+                    </div>
+
+                    <button id="startSyncBtn" class="btn btn-success" disabled>
+                        <i class="bi bi-arrow-repeat"></i> Start Sync
+                    </button>
+                </div>
+
+                <div id="sync-progress" style="display: none;">
+                    <div class="progress mb-3" style="height: 30px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                            role="progressbar" style="width: 0%">0%</div>
+                    </div>
+
+                    <div id="statusText" class="alert alert-info">
+                        Initializing...
+                    </div>
+
+                    <div id="logContainer" class="border rounded p-3"
+                        style="max-height: 400px; overflow-y: auto; background: #f8f9fa;">
+                        <div id="logMessages"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // We need a route to get AM playlists. I didn't add that to applemusic.py yet!
+    // I added get_user_playlists to the client class, but not a route.
+    // Let's add that route now or just generic error handling here.
+    // Actually, I missed adding a route to list AM playlists in applemusic.py in the previous step.
+    // I can add it now via tool. For now, let's assume I'll add `/applemusic/playlists-data`.
+
+    async function fetchPlaylists() {
+        try {
+            const response = await fetch('/applemusic/playlists-data');
+            if (response.status === 404) throw new Error("Route not implemented");
+
+            const data = await response.json();
+
+            const select = document.getElementById('playlistSelect');
+            select.innerHTML = '<option value="">-- Select a playlist --</option>';
+
+            if (data && data.length > 0) {
+                data.forEach(pl => {
+                    const option = document.createElement('option');
+                    option.value = pl.id;
+                    option.textContent = `${pl.attributes.name}`;
+                    select.appendChild(option);
+                });
+                select.disabled = false;
+            } else {
+                select.innerHTML = '<option value="">No playlists found or manual entry required</option>';
+            }
+
+        } catch (error) {
+            console.error('Error fetching playlists:', error);
+            document.getElementById('playlistSelect').innerHTML = '<option value="">Manual ID entry required</option>';
+        }
+        document.getElementById('startSyncBtn').disabled = false;
+    }
+
+    // Start sync
+    document.getElementById('startSyncBtn').addEventListener('click', () => {
+        const select = document.getElementById('playlistSelect');
+        let playlistId = select.value;
+        const manualId = document.getElementById('playlistIdInput').value;
+
+        if (manualId) playlistId = manualId;
+
+        const playlistName = document.getElementById('playlistName').value;
+
+        if (!playlistId) {
+            alert('Please select a playlist or enter an ID');
+            return;
+        }
+
+        // Hide setup, show progress
+        document.getElementById('sync-setup').style.display = 'none';
+        document.getElementById('sync-progress').style.display = 'block';
+
+        // Build URL
+        let url = `/sync/start-applemusic-to-spotify?playlist_id=${encodeURIComponent(playlistId)}`;
+        if (playlistName) {
+            url += `&name=${encodeURIComponent(playlistName)}`;
+        }
+
+        // Start EventSource
+        const eventSource = new EventSource(url);
+
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            updateProgress(data);
+        };
+
+        eventSource.addEventListener('complete', (event) => {
+            const data = JSON.parse(event.data);
+            updateProgress(data);
+            eventSource.close();
+
+            document.getElementById('statusText').className = 'alert alert-success';
+            setTimeout(() => {
+                if (confirm('Sync complete! Go back to dashboard?')) {
+                    window.location.href = '/dashboard';
+                }
+            }, 2000);
+        });
+
+        eventSource.addEventListener('error', (event) => {
+            let message = 'An error occurred';
+            if (event.data) {
+                try {
+                    const data = JSON.parse(event.data);
+                    message = data.message || message;
+                } catch (e) { }
+            }
+
+            document.getElementById('statusText').className = 'alert alert-danger';
+            document.getElementById('statusText').textContent = 'Error: ' + message;
+            eventSource.close();
+        });
+    });
+
+    function updateProgress(data) {
+        if (data.percent !== undefined) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = data.percent + '%';
+            progressBar.textContent = Math.round(data.percent) + '%';
+        }
+
+        if (data.status) {
+            document.getElementById('statusText').textContent = data.status;
+        }
+
+        if (data.message) {
+            const logMessages = document.getElementById('logMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'mb-1';
+
+            if (data.type === 'success') {
+                msgDiv.className += ' text-success';
+            } else if (data.type === 'danger') {
+                msgDiv.className += ' text-danger';
+            } else if (data.type === 'warning') {
+                msgDiv.className += ' text-warning';
+            }
+
+            msgDiv.textContent = data.message;
+            logMessages.appendChild(msgDiv);
+
+            // Auto-scroll
+            document.getElementById('logContainer').scrollTop =
+                document.getElementById('logContainer').scrollHeight;
+        }
+    }
+
+    // Load playlists on page load
+    fetchPlaylists();
+</script>
+{% endblock %}
