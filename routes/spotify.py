@@ -41,7 +41,9 @@ def callback():
     
     client_id = current_app.config['SPOTIFY_CLIENT_ID']
     client_secret = current_app.config['SPOTIFY_CLIENT_SECRET']
-    redirect_uri = request.host_url.rstrip('/') + url_for('spotify.callback')
+    
+    base_url = current_app.config.get('BASE_URL') or request.host_url
+    redirect_uri = f"{base_url.rstrip('/')}{url_for('spotify.callback')}"
     
     # Exchange authorization code for access token
     token_url = 'https://accounts.spotify.com/api/token'

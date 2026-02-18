@@ -29,6 +29,8 @@ app.config['UPLOAD_FOLDER'] = 'user_data'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SPOTIFY_CLIENT_ID'] = os.environ.get('SPOTIFY_CLIENT_ID', '329e873b7a9f45a4a8128770e084e27c')
 app.config['SPOTIFY_CLIENT_SECRET'] = os.environ.get('SPOTIFY_CLIENT_SECRET', '')
+app.config['BASE_URL'] = os.environ.get('BASE_URL')  # Required for production/cloud deployment
+app.config['BASE_URL'] = os.environ.get('BASE_URL')
 
 # Session configuration for Flask-Login
 app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
